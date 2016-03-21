@@ -1,0 +1,713 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="这是我学习和放肆的地方。" />
+
+
+
+  <meta name="keywords" content="Algorithms," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一派胡言" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/iocn.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="前言开始刷Coursera的Algorithms课，在此尽量为每个Lectures写篇笔记。
+Union-Find并查集，顾名思义，主要两个操作。
+
+union  合并两个集合
+find   查询两个对象是否属于一个集合
+
+一个集合称为Connected components.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Union-Find">
+<meta property="og:url" content="http://threezj.com/2016/03/12/Union-Find /index.html">
+<meta property="og:site_name" content="一派胡言">
+<meta property="og:description" content="前言开始刷Coursera的Algorithms课，在此尽量为每个Lectures写篇笔记。
+Union-Find并查集，顾名思义，主要两个操作。
+
+union  合并两个集合
+find   查询两个对象是否属于一个集合
+
+一个集合称为Connected components.">
+<meta property="og:image" content="http://7xrsib.com1.z0.glb.clouddn.com/union-find2.jpg">
+<meta property="og:image" content="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312144918.jpg">
+<meta property="og:image" content="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312150842.jpg">
+<meta property="og:image" content="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312151450.jpg">
+<meta property="og:image" content="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312152041.jpg">
+<meta property="og:image" content="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312152827.jpg">
+<meta property="og:updated_time" content="2016-03-12T11:49:11.371Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Union-Find">
+<meta name="twitter:description" content="前言开始刷Coursera的Algorithms课，在此尽量为每个Lectures写篇笔记。
+Union-Find并查集，顾名思义，主要两个操作。
+
+union  合并两个集合
+find   查询两个对象是否属于一个集合
+
+一个集合称为Connected components.">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> Union-Find | 一派胡言 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', '68406138-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?d241596b4ad0af8cde22ce7719177cca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">一派胡言</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              Union-Find
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2016-03-12T15:37:45+08:00" content="2016-03-12">
+            2016-03-12
+          </time>
+        </span>
+
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2016/03/12/Union-Find /#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/12/Union-Find /" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="前言">前言</h2><p>开始刷<code>Coursera</code>的<code>Algorithms</code>课，在此尽量为每个<code>Lectures</code>写篇笔记。</p>
+<h2 id="Union-Find">Union-Find</h2><p>并查集，顾名思义，主要两个操作。</p>
+<ul>
+<li><code>union</code>  合并两个集合</li>
+<li><code>find</code>   查询两个对象是否属于一个集合</li>
+</ul>
+<p>一个集合称为<code>Connected components</code>.</p>
+<p><img src="http://7xrsib.com1.z0.glb.clouddn.com/union-find2.jpg" alt=""><br><a id="more"></a></p>
+<h2 id="quick-find">quick-find</h2><p>用数组来保存数据。若两个数据的索引在数组中的值一样，则称两个数据在一个集合。</p>
+<ul>
+<li><p><code>union(p,q)</code> 也就是<code>data[p]=data[q]</code>,但是注意，所有和p在同一个集合的数都要链接到q集合。所以这里需要一个循环操作。</p>
+</li>
+<li><p><code>find(p,q)</code>  判断 <code>data[p]==data[q]</code> </p>
+</li>
+</ul>
+<p><img src="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312144918.jpg" alt=""></p>
+<p>主要代码如下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QF</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> data[];</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">QF</span><span class="params">()</span></span>&#123;</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        data = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">            data[i]=i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> q)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> data[p]==data[q];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">union</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> q)</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> tp = data[p];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;data.length;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(data[i]==tp)</span><br><span class="line">                data[i]=data[q];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此方法查询效率很高。但是合并效率低。如果要合并n个集合，集合总共有m个数据，时间复杂度就是n的平方了，</p>
+<p><img src="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312150842.jpg" alt=""></p>
+<h2 id="quick-union">quick-union</h2><p>此方法改变集合存储方式，以一颗树的方式来存储。每次合并的时候只要改变根节点即可。</p>
+<p>主要储存方式为，比如说<code>index=1</code>的节点的父亲节点为<code>data[1]</code>,<code>index=1</code>的祖父节点为<code>data[data[1]]</code>，以此类推，如果<code>data[i]==i</code>,则找到了根节点。</p>
+<ul>
+<li><p><code>union(p,q)</code> 改变p的根节点数组数据为q的根节点。即<code>data[root(p)]=root(q)</code></p>
+</li>
+<li><p><code>find(p,q)</code>  判断p q的根节点是否相同。</p>
+</li>
+</ul>
+<p><img src="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312151450.jpg" alt=""></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">root</span><span class="params">(<span class="keyword">int</span> r)</span></span>&#123;</span><br><span class="line">      <span class="keyword">while</span>(data[r]!=r)</span><br><span class="line">          r=data[r];</span><br><span class="line">      <span class="keyword">return</span> r;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> q)</span></span>&#123;</span><br><span class="line">      <span class="keyword">return</span> root(p)==root(q);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">union</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> q)</span></span>&#123;</span><br><span class="line">      <span class="keyword">int</span> rq=root(q);</span><br><span class="line">      <span class="keyword">int</span> rp=root(p);</span><br><span class="line">      data[rq]=rp;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>这个算法比刚才的效率高了不少，唯一要担心的是<code>root()</code>方法，此方法会遍历整棵树查找根节点，如果树太高的话。效率会受到一定影响，下面我进行一些优化。</p>
+<h2 id="改进quick-union">改进quick-union</h2><h3 id="weighted_QU">weighted QU</h3><p>一个比较简单的方法是，每次在挂接树的时候。把节点较少的树挂到节点较多的树上，此方法能有效降低树的高度。</p>
+<p><img src="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312152041.jpg" alt=""></p>
+<p>代码也很简单.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">union</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> q)</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> rq=root(q);</span><br><span class="line">        <span class="keyword">int</span> rp=root(p);</span><br><span class="line">        <span class="keyword">if</span>(size[rp]&gt;=size[rq])&#123;</span><br><span class="line">            data[rq]=rp;</span><br><span class="line">            size[rp]+=size[rq];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            data[rp]=rq;</span><br><span class="line">            size[rq]+=size[rp];</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此时复杂度为<code>logN</code></p>
+<h3 id="path_compression">path compression</h3><p>另一种方法路径压缩。因为我们在使用并查集的时候并不关心数据顺序。所以可以在查询根节点时候，顺便压缩树的高度。</p>
+<p>具体措施就是 把<code>index=1</code>的父节点<code>data[index]</code>挂接到他的祖父节点上也就是<code>data[data[index]]</code></p>
+<p>一行代码，就搞定。时间复杂度也为<code>logN</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">root</span><span class="params">(<span class="keyword">int</span> r)</span></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(data[r]!=r)&#123;</span><br><span class="line">    	data[r]=data[data[r]]</span><br><span class="line">        r=data[r];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> r;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="效率比较">效率比较</h2><p><img src="http://7xrsib.com1.z0.glb.clouddn.com/union-findQQ%E6%88%AA%E5%9C%9620160312152827.jpg" alt=""></p>
+<h2 id="Reference">Reference</h2><p><a href="https://www.coursera.org/course/algs4partI" target="_blank" rel="external">Algorithms</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Algorithms/" rel="tag">#Algorithms</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/03/13/简单排序之冒泡、选择、插入、希尔/" rel="prev">简单排序之冒泡、选择、插入、希尔详细总结</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/02/Java static  初始化顺序/" rel="next">Java static 初始化顺序</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/03/12/Union-Find /"
+                   data-title="Union-Find" data-url="http://threezj.com/2016/03/12/Union-Find /">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/uploads/avatar.jpg" alt="Threezj" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Threezj</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">这是我学习和放肆的地方。</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="menu-item-icon icon-next-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/threezj" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/zjthree" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Union-Find"><span class="nav-number">2.</span> <span class="nav-text">Union-Find</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#quick-find"><span class="nav-number">3.</span> <span class="nav-text">quick-find</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#quick-union"><span class="nav-number">4.</span> <span class="nav-text">quick-union</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改进quick-union"><span class="nav-number">5.</span> <span class="nav-text">改进quick-union</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#weighted_QU"><span class="nav-number">5.1.</span> <span class="nav-text">weighted QU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#path_compression"><span class="nav-number">5.2.</span> <span class="nav-text">path compression</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#效率比较"><span class="nav-number">6.</span> <span class="nav-text">效率比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">7.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Threezj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"threezj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
